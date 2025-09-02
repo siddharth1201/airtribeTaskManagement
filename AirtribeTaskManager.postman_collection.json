@@ -1,0 +1,264 @@
+{
+	"info": {
+		"_postman_id": "d8210ada-d312-41ed-8109-2880c4878d81",
+		"name": "AirtribeTaskManager",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36986465"
+	},
+	"item": [
+		{
+			"name": "gettask",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response content type is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/json');",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response is an array with at least one task object\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+							"    responseData.forEach(task => {",
+							"        pm.expect(task).to.be.an('object');",
+							"    });",
+							"});",
+							"",
+							"",
+							"pm.test(\"Each task object contains the required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+							"",
+							"    responseData.forEach(function(task) {",
+							"        pm.expect(task).to.have.all.keys('id', 'name', 'description', 'status', 'priority', 'createdAt', 'updatedAt', 'dueDate');",
+							"    });",
+							"});",
+							"",
+							"",
+							"pm.test(\"CreatedAt and UpdatedAt are in a valid date format\", function () {",
+							"    const responseData = pm.response.json();",
+							"",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+							"",
+							"    responseData.forEach(task => {",
+							"        pm.expect(task.createdAt).to.exist.and.to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/, \"CreatedAt should be in ISO 8601 format\");",
+							"        pm.expect(task.updatedAt).to.exist.and.to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/, \"UpdatedAt should be in ISO 8601 format\");",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8080/tasks",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"tasks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createTask",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 201\", function () {",
+							"    pm.expect(pm.response.status).to.eql(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response has the required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.all.keys('id', 'name', 'description', 'status', 'priority', 'dueDate');",
+							"});",
+							"",
+							"",
+							"pm.test(\"The ID must be a positive integer\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.id).to.be.a('number').and.to.be.above(0);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Status is one of the expected values\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.status).to.exist;",
+							"    pm.expect([\"pending\", \"completed\"]).to.include(responseData.status);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Due date must be in a valid date format\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.dueDate).to.exist;",
+							"    pm.expect(new Date(responseData.dueDate).getTime()).to.not.be.NaN;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"First task\",\r\n    \"description\": \"this is a sample descrioption\",\r\n    \"dueDate\": \"2025-08-37\",\r\n    \"priority\": \"LOW\",\r\n    \"status\": \"IN_PROGRESS\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/tasks",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"tasks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.eql(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response contains required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.all.keys('id', 'name', 'description', 'status', 'priority', 'dueDate');",
+							"});",
+							"",
+							"",
+							"pm.test(\"ID must be a non-negative integer\", function () {",
+							"    const responseData = pm.response.json();",
+							"",
+							"    pm.expect(responseData).to.have.property('id');",
+							"    pm.expect(responseData.id).to.be.a('number').and.to.be.at.least(0);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Status is one of the expected values\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.status).to.satisfy(function(status) {",
+							"        return [\"pending\", \"completed\"].includes(status);",
+							"    }, \"Status should be either 'pending' or 'completed'\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Due date is in a valid date format\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.dueDate).to.exist;",
+							"    pm.expect(new Date(responseData.dueDate).getTime()).to.not.be.NaN;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Complete Airtribe Assignment\",\r\n  \"description\": \"This task involves completing the Airtribe assignment and submitting it for review.\",\r\n  \"status\": \"IN_PROGRESS\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2025-09-10T10:00:00Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/tasks/4",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"tasks",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Task",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8080/tasks/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"tasks",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
