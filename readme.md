@@ -11,7 +11,7 @@ Follow the steps below to set up and run the project locally:
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/siddharth1201/airtribeTaskManagement.git
 ````
 
 ### 2. Navigate to the Project Directory
